@@ -21,6 +21,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
+import KanbanCobrancas from '../components/KanbanCobrancas';
 
 interface MetricasExecutivas {
   totalCobrancas: number;
