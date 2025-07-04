@@ -1,34 +1,88 @@
-<<<<<<< HEAD
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://kmgthlgycfdffskicirq.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3RobGd5Y2ZkZmZza2ljaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MTcxNTQsImV4cCI6MjA2NjA5MzE1NH0.DTIOuJHQw5zdS-8wK8S8vDY6N74owQX_f1TqsCBcbak';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const ASSISTENTES = [
+  { nome: 'Danielle', total: 0, cobrancas: [] },
+  { nome: 'Saiene', total: 0, cobrancas: [] }
+];
+const META_MENSAL = 50000;
+
+function parseValor(valor: string) {
+  return Number(valor.replace('.', '').replace(',', '.'));
+}
+
+function parseDate(data: string) {
+  // Espera formato DD/MM/YYYY
+  const [dia, mes, ano] = data.split('/');
+  return `${ano}-${mes}-${dia}`;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  // Aqui você recebe os dados da planilha
-  const dados = req.body;
-
-  // TODO: Processar e salvar no banco, rodar distribuição, etc.
-  console.log('Recebido do Sheets:', dados);
-
-  // Resposta para o Apps Script
-  res.status(200).json({ ok: true });
-=======
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+  const { dados } = req.body;
+  if (!dados || !Array.isArray(dados) || dados.length < 2) {
+    return res.status(400).json({ error: 'Dados inválidos' });
   }
 
-  // Aqui você recebe os dados da planilha
-  const dados = req.body;
+  // Extrai cabeçalhos e linhas
+  const headers = dados[0];
+  const linhas = dados.slice(1).filter(linha => linha[0]); // ignora linhas vazias
 
-  // TODO: Processar e salvar no banco, rodar distribuição, etc.
-  console.log('Recebido do Sheets:', dados);
+  // Mapeia as cobranças
+  const cobrancas = linhas.map(linha => ({
+    cliente: linha[0],
+    cpf_cnpj: linha[1],
+    valor: parseValor(linha[2]),
+    vencimento: parseDate(linha[3]),
+    empreendimento: linha[4],
+    produto: linha[5],
+    status: linha[6],
+    tipo_cobranca: linha[7],
+    parcelas: linha[8] ? Number(linha[8]) : null
+  }));
 
-  // Resposta para o Apps Script
-  res.status(200).json({ ok: true });
->>>>>>> 9c2dcd0b612cc2766e1ecc6827b32c641c7d64ba
+  // Busca totais atuais das assistentes no mês
+  const inicioMes = new Date();
+  inicioMes.setDate(1);
+  const inicioMesStr = inicioMes.toISOString().slice(0, 10);
+
+  for (const assistente of ASSISTENTES) {
+    const { data, error } = await supabase
+      .from('cobrancas')
+      .select('valor')
+      .eq('assistente', assistente.nome)
+      .gte('vencimento', inicioMesStr);
+
+    assistente.total = data ? data.reduce((acc, cur) => acc + Number(cur.valor), 0) : 0;
+    assistente.cobrancas = [];
+  }
+
+  // Algoritmo de distribuição
+  cobrancas.sort((a, b) => new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime());
+  for (const cobranca of cobrancas) {
+    ASSISTENTES.sort((a, b) => a.total - b.total);
+    const escolhida = ASSISTENTES[0];
+    escolhida.cobrancas.push(cobranca);
+    escolhida.total += cobranca.valor;
+  }
+
+  // Salva no Supabase
+  let inseridos = 0;
+  for (const assistente of ASSISTENTES) {
+    for (const cobranca of assistente.cobrancas) {
+      const { error } = await supabase
+        .from('cobrancas')
+        .insert([{ ...cobranca, assistente: assistente.nome }]);
+      if (!error) inseridos++;
+    }
+  }
+
+  res.status(200).json({ ok: true, inseridos });
 }
