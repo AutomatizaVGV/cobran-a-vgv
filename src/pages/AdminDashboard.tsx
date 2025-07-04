@@ -193,7 +193,6 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
-        <KanbanCobrancas />
       </div>
     </div>
   );
