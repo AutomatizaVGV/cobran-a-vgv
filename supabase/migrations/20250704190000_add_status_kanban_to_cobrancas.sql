@@ -1,0 +1,1 @@
+alter table cobrancas add column if not exists status_kanban text default 'a_contatar'; 

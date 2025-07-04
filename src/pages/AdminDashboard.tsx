@@ -18,6 +18,7 @@ import {
   Loader2,
   UserCheck
 } from 'lucide-react';
+import KanbanCobrancas from '../components/KanbanCobrancas';
 
 const AdminDashboard = () => {
   const { cobrancas, loading, calcularMetricas } = useCobrancas({ userRole: 'admin' });
@@ -192,6 +193,7 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        <KanbanCobrancas />
       </div>
     </div>
   );
