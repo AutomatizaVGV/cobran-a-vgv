@@ -1,0 +1,16 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método não permitido' });
+  }
+
+  // Aqui você recebe os dados da planilha
+  const dados = req.body;
+
+  // TODO: Processar e salvar no banco, rodar distribuição, etc.
+  console.log('Recebido do Sheets:', dados);
+
+  // Resposta para o Apps Script
+  res.status(200).json({ ok: true });
+}
