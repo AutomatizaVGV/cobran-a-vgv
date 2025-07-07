@@ -134,14 +134,10 @@ const UserDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="cobrancas" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="cobrancas" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" />
               Minhas Cobranças
-            </TabsTrigger>
-            <TabsTrigger value="cadencia" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Cadência
             </TabsTrigger>
             <TabsTrigger value="metricas" className="flex items-center gap-2">
               <Target className="w-4 h-4" />
@@ -309,9 +305,7 @@ const UserDashboard = () => {
             />
           </TabsContent>
 
-          <TabsContent value="cadencia">
-            <CadenciaMessages />
-          </TabsContent>
+          {/* Removido: <TabsContent value="cadencia"> <CadenciaMessages /> </TabsContent> */}
 
           <TabsContent value="metricas">
             <MetricasDiarias />
