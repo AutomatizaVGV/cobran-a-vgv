@@ -17,6 +17,7 @@ interface Cobranca {
   tipo_cobranca: string | null;
   juros_recebidos: number | null;
   assistente_responsavel: string | null;
+  status_kanban?: string | null; // Adicionado para suportar status de agendamento
 }
 
 interface UseCobrancasProps {
@@ -89,12 +90,16 @@ export const useCobrancas = ({ userRole }: UseCobrancasProps = {}) => {
     
     const valorRecuperado = cobrancas
       .filter(c => c.status_pagamento === 'pago')
+      .reduce((sum, c) => sum + Number(c.valor), 0);
+    const jurosRecebidos = cobrancas
+      .filter(c => c.status_pagamento === 'pago')
       .reduce((sum, c) => sum + Number(c.juros_recebidos || 0), 0);
 
     return {
       totalClientes,
       valorEmAberto,
-      valorRecuperado
+      valorRecuperado,
+      jurosRecebidos
     };
   };
 

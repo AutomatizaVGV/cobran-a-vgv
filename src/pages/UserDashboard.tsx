@@ -23,9 +23,10 @@ import {
   Loader2
 } from 'lucide-react';
 import AcoesCobrancaModal from '@/components/AcoesCobrancaModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserDashboard = () => {
-  const { cobrancas, loading, calcularDiasAtraso, calcularMetricas } = useCobrancas({ userRole: 'user' });
+  const { cobrancas, loading, calcularDiasAtraso, calcularMetricas, carregarCobrancas } = useCobrancas({ userRole: 'user' });
   
   // Estados para filtros
   const [filtroDataCobranca, setFiltroDataCobranca] = useState('');
@@ -48,6 +49,8 @@ const UserDashboard = () => {
   const metricas = calcularMetricas();
 
   const cobrancasFiltradas = cobrancas.filter(cobranca => {
+    if (cobranca.status_kanban === 'reagendado') return false;
+    if (cobranca.status_pagamento === 'pago') return false;
     const matchPesquisa = cobranca.cliente_nome.toLowerCase().includes(pesquisa.toLowerCase()) ||
                           cobranca.cpf_cnpj.includes(pesquisa);
     const matchDataCobranca = !filtroDataCobranca || cobranca.data_cobranca === filtroDataCobranca;
@@ -56,6 +59,19 @@ const UserDashboard = () => {
 
     return matchPesquisa && matchDataCobranca && matchStatusCliente && matchTipoCobranca;
   });
+
+  // Adicionar funções auxiliares para atualizar status_cliente e tipo_cobranca
+  const statusClienteOptions = [
+    'Regular', 'SPC', 'Serasa', 'Protesto'
+  ];
+  const tipoCobrancaOptions = [
+    'Cobrança +VGV', 'Serasa', 'Cartório', 'Protestado', '-'
+  ];
+
+  const atualizarCampoCobranca = async (id, campo, valor) => {
+    await supabase.from('cobrancas').update({ [campo]: valor }).eq('id', id);
+    carregarCobrancas();
+  };
 
   if (loading) {
     return (
@@ -78,7 +94,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -115,6 +131,18 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
 
+          <Card className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-yellow-100 text-sm">Juros Recebidos</p>
+                  <p className="text-2xl font-bold">R$ {(metricas.jurosRecebidos / 1000).toFixed(0)}k</p>
+                </div>
+                <DollarSign className="w-8 h-8 text-yellow-200" />
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -139,9 +167,9 @@ const UserDashboard = () => {
               <ClipboardList className="w-4 h-4" />
               Minhas Cobranças
             </TabsTrigger>
-            <TabsTrigger value="metricas" className="flex items-center gap-2">
-              <Target className="w-4 h-4" />
-              Métricas
+            <TabsTrigger value="agendados" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Agendados
             </TabsTrigger>
             <TabsTrigger value="relatorios" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -271,12 +299,32 @@ const UserDashboard = () => {
                                 )}
                               </td>
                               <td className="p-4">
-                                <Badge variant={cobranca.status_cliente === 'Regular' ? 'default' : 'destructive'}>
-                                  {cobranca.status_cliente || 'Regular'}
-                                </Badge>
+                                {cobranca.status_pagamento === 'pago' ? (
+                                  <Badge variant="default">Quitado</Badge>
+                                ) : (
+                                  <Select value={cobranca.status_cliente || 'Regular'} onValueChange={valor => atualizarCampoCobranca(cobranca.id, 'status_cliente', valor)}>
+                                    <SelectTrigger className="w-28">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {statusClienteOptions.map(opt => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                )}
                               </td>
                               <td className="p-4">
-                                <Badge variant="outline">{cobranca.tipo_cobranca || '-'}</Badge>
+                                <Select value={cobranca.tipo_cobranca || '-'} onValueChange={valor => atualizarCampoCobranca(cobranca.id, 'tipo_cobranca', valor)}>
+                                  <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {tipoCobrancaOptions.map(opt => (
+                                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </td>
                               <td className="p-4">
                                 <Badge variant={cobranca.status_pagamento === 'pago' ? 'default' : 'secondary'}>
@@ -301,14 +349,86 @@ const UserDashboard = () => {
               isOpen={modalAberto}
               onClose={fecharModalAcao}
               cobranca={cobrancaSelecionada}
-              onAcaoSalva={() => { fecharModalAcao(); /* pode recarregar cobranças se necessário */ }}
+              onAcaoSalva={() => { fecharModalAcao(); carregarCobrancas(); }}
             />
           </TabsContent>
 
           {/* Removido: <TabsContent value="cadencia"> <CadenciaMessages /> </TabsContent> */}
 
-          <TabsContent value="metricas">
-            <MetricasDiarias />
+          <TabsContent value="agendados">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Clientes Agendados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-4">Cliente</th>
+                        <th className="text-left p-4">Empreendimento</th>
+                        <th className="text-left p-4">Valor</th>
+                        <th className="text-left p-4">Vencimento</th>
+                        <th className="text-left p-4">Status Cliente</th>
+                        <th className="text-left p-4">Tipo Cobrança</th>
+                        <th className="text-left p-4">Status</th>
+                        <th className="text-left p-4">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cobrancas.filter(c => c.status_kanban === 'reagendado').length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="text-center py-8 text-slate-500">Nenhum cliente agendado encontrado.</td>
+                        </tr>
+                      ) : (
+                        cobrancas.filter(c => c.status_kanban === 'reagendado').map((cobranca) => {
+                          const diasAtraso = calcularDiasAtraso(cobranca.vencimento);
+                          return (
+                            <tr key={cobranca.id} className="border-b hover:bg-slate-50">
+                              <td className="p-4">
+                                <div>
+                                  <div className="font-semibold">{cobranca.cliente_nome}</div>
+                                  <div className="text-sm text-slate-600">{cobranca.cpf_cnpj}</div>
+                                </div>
+                              </td>
+                              <td className="p-4">{cobranca.empreendimento || '-'}</td>
+                              <td className="p-4 font-semibold">R$ {Number(cobranca.valor).toLocaleString()}</td>
+                              <td className="p-4">
+                                <div>{new Date(cobranca.vencimento).toLocaleDateString()}</div>
+                                {diasAtraso > 0 && (
+                                  <div className="text-xs text-red-600">{diasAtraso} dias atraso</div>
+                                )}
+                              </td>
+                              <td className="p-4">
+                                <Badge variant={cobranca.status_cliente === 'Regular' ? 'default' : 'destructive'}>
+                                  {cobranca.status_cliente || 'Regular'}
+                                </Badge>
+                              </td>
+                              <td className="p-4">
+                                <Badge variant="outline">{cobranca.tipo_cobranca || '-'}</Badge>
+                              </td>
+                              <td className="p-4">
+                                <Badge variant={cobranca.status_pagamento === 'pago' ? 'default' : 'secondary'}>
+                                  {cobranca.status_pagamento === 'pago' ? 'Pago' : 'Em Aberto'}
+                                </Badge>
+                              </td>
+                              <td className="p-4">
+                                <Button size="sm" variant="default" onClick={() => abrirModalAcao(cobranca)}>
+                                  Registrar Ação
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="relatorios">

@@ -107,8 +107,21 @@ const AcoesCobrancaModal: React.FC<AcoesCobrancaModalProps> = ({
         resultado_ultima_acao: formData.resultado || null
       };
 
+      // Se o resultado for relacionado a pagamento, marcar como pago
+      const resultadosPagamento = [
+        'Pagamento confirmado',
+        'Pagamento realizado',
+        'Quitado',
+        'Cliente pagou',
+        'Pagamento efetuado'
+      ];
+      if (resultadosPagamento.includes(formData.resultado)) {
+        updateData.status_pagamento = 'pago';
+      }
+
       if (formData.proximaAcao && formData.dataProximaAcao) {
         updateData.proxima_acao = `${formData.proximaAcao} - ${formData.dataProximaAcao}`;
+        updateData.status_kanban = 'reagendado';
       }
 
       const { error: cobrancaError } = await supabase
