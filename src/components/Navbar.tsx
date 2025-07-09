@@ -24,7 +24,7 @@ const Navbar = ({ userRole = 'user', userName = 'Usuário' }: NavbarProps) => {
 
   return (
     <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-4 shadow-sm sticky top-0 z-30 transition-colors">
-      <div className="flex items-center justify-between max-w-7xl mx-auto px-2 md:px-8 lg:px-12 min-h-[72px]">
+      <div style={{ width: '100%', padding: '0 70px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo e Título */}
         <div className="flex items-center gap-5 md:gap-7 lg:gap-10">
           <img 

@@ -86,16 +86,16 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50" style={{ width: '100%', margin: 0, padding: '0 70px', overflowX: 'hidden' }}>
+      <div style={{ width: '100%', margin: 0, padding: 0 }}>
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8" style={{ width: '100%', margin: 0, padding: '32px 0 0 0' }}>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Painel do Assistente</h1>
           <p className="text-slate-600">Gerencie suas cobranças e acompanhe seu desempenho</p>
         </div>
 
         {/* Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8" style={{ width: '100%', margin: 0, padding: 0 }}>
           <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">

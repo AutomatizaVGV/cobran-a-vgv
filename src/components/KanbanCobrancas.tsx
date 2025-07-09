@@ -52,27 +52,28 @@ export default function KanbanCobrancas() {
   return (
     <div
       style={{
-        display: 'flex',
-        gap: 10,
-        overflowX: 'auto',
+        width: '100%',
+        margin: 0,
         padding: '24px 0',
         background: isDark ? '#23272f' : 'linear-gradient(90deg, #f8fafc 60%, #f1f5f9 100%)',
         borderRadius: 24,
         minHeight: 540,
-        width: '100vw',
-        maxWidth: '100vw',
-        margin: '0 calc(-50vw + 50%)',
         boxSizing: 'border-box',
-        justifyContent: 'flex-start',
         boxShadow: '0 8px 32px #0001',
         transition: 'background 0.3s',
+        // overflowX: 'auto', // Removido para eliminar scroll horizontal
+        display: 'flex',
+        justifyContent: 'stretch',
+        gap: 0,
       }}
-      className="transition-colors"
+      className="transition-colors kanban-proporcional"
     >
       {COLUNAS.map((col, idx) => (
         <div key={col.key} style={{
-          minWidth: 260,
-          flex: 1,
+          flex: '1 1 0',
+          minWidth: 180,
+          maxWidth: 'none',
+          width: `calc(100% / ${COLUNAS.length})`,
           background: idx % 2 === 0 ? '#f9fafb' : '#f3f4f6',
           borderRadius: 18,
           padding: 24,
@@ -81,7 +82,7 @@ export default function KanbanCobrancas() {
           flexDirection: 'column',
           maxHeight: 700,
           borderRight: idx < COLUNAS.length - 1 ? '2px solid #e2e8f0' : 'none',
-          marginRight: idx < COLUNAS.length - 1 ? 0 : undefined,
+          marginRight: 0,
           transition: 'box-shadow 0.2s',
         }}>
           <h3 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: '#1e293b', textTransform: 'uppercase', letterSpacing: 1 }}>{col.label}</h3>
