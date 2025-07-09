@@ -25,77 +25,49 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600">Carregando dados administrativos...</p>
+          <p className="text-slate-600 dark:text-slate-300">Carregando dados administrativos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#23272f] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Painel Administrativo</h1>
-          <p className="text-slate-600">Gerencie o sistema e monitore todas as cobranças</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Painel Administrativo</h1>
+          <p className="text-slate-600 dark:text-slate-300">Gerencie o sistema e monitore todas as cobranças</p>
         </div>
 
-        {/* Métricas Gerais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Total de Clientes</p>
-                  <p className="text-3xl font-bold">{metricas.totalClientes}</p>
-                </div>
-                <Users className="w-8 h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-600 to-red-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-100 text-sm">Valor Total em Aberto</p>
-                  <p className="text-2xl font-bold">R$ {(metricas.valorEmAberto / 1000).toFixed(0)}k</p>
-                </div>
-                <DollarSign className="w-8 h-8 text-red-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-600 to-green-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm">Valor Recuperado</p>
-                  <p className="text-2xl font-bold">R$ {(metricas.valorRecuperado / 1000).toFixed(0)}k</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Taxa de Recuperação</p>
-                  <p className="text-3xl font-bold">
-                    {metricas.totalClientes > 0 
-                      ? Math.round((cobrancas.filter(c => c.status_pagamento === 'pago').length / metricas.totalClientes) * 100)
-                      : 0}%
-                  </p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Inadimplência Total */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Inadimplência Total</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="bg-gradient-to-br from-red-600 to-red-700 text-white rounded-xl p-6 shadow">
+              <div className="text-sm mb-1">Valor Total</div>
+              <div className="text-2xl font-bold">R$ 120.000,00</div>
+            </div>
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl p-6 shadow">
+              <div className="text-sm mb-1">Forma de Pagamento</div>
+              <div className="text-lg font-semibold">Boleto</div>
+            </div>
+            <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-xl p-6 shadow">
+              <div className="text-sm mb-1">Onde está a Cobrança</div>
+              <div className="text-lg font-semibold">Jurídico</div>
+            </div>
+            <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-xl p-6 shadow">
+              <div className="text-sm mb-1">Situação do Cliente</div>
+              <div className="text-lg font-semibold">Protestado</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-xl p-6 shadow">
+              <div className="text-sm mb-1">Centro de Custo</div>
+              <div className="text-lg font-semibold">Produto X</div>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}

@@ -21,7 +21,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
-import KanbanCobrancas from '../components/KanbanCobrancas';
+
 
 interface MetricasExecutivas {
   totalCobrancas: number;
@@ -161,23 +161,23 @@ const DashboardExecutivo = () => {
 
   if (loading || !metricas) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#23272f] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600">Carregando dashboard executivo...</p>
+          <p className="text-slate-600 dark:text-slate-300">Carregando dashboard executivo...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#23272f] p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Dashboard Executivo</h1>
-            <p className="text-slate-600">Visão estratégica do sistema de cobranças</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard Executivo</h1>
+            <p className="text-slate-600 dark:text-slate-300">Visão estratégica do sistema de cobranças</p>
           </div>
           
           <Select value={periodo} onValueChange={setPeriodo}>
@@ -193,71 +193,86 @@ const DashboardExecutivo = () => {
           </Select>
         </div>
 
-        {/* KPIs Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Valor Total</p>
-                  <p className="text-3xl font-bold">{formatarMoeda(metricas.valorTotal)}</p>
-                  <div className="flex items-center mt-2">
-                    <ArrowUpRight className="w-4 h-4 text-green-300" />
-                    <span className="text-sm text-blue-100">+12.5% vs mês anterior</span>
+        {/* Após o header (título, subtítulo e seletor de período): */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Relatório de Cobrança</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100 text-sm">Valor Total</p>
+                    <p className="text-3xl font-bold">{formatarMoeda(metricas.valorTotal)}</p>
+                    <div className="flex items-center mt-2">
+                      <ArrowUpRight className="w-4 h-4 text-green-300" />
+                      <span className="text-sm text-blue-100">+12.5% vs mês anterior</span>
+                    </div>
                   </div>
+                  <DollarSign className="w-8 h-8 text-blue-200" />
                 </div>
-                <DollarSign className="w-8 h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-600 to-red-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-100 text-sm">Em Aberto</p>
-                  <p className="text-3xl font-bold">{formatarMoeda(metricas.valorEmAberto)}</p>
-                  <div className="flex items-center mt-2">
-                    <ArrowDownRight className="w-4 h-4 text-red-300" />
-                    <span className="text-sm text-red-100">-5.2% vs mês anterior</span>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-red-600 to-red-700 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-100 text-sm">Em Aberto</p>
+                    <p className="text-3xl font-bold">{formatarMoeda(metricas.valorEmAberto)}</p>
+                    <div className="flex items-center mt-2">
+                      <ArrowDownRight className="w-4 h-4 text-red-300" />
+                      <span className="text-sm text-red-100">-5.2% vs mês anterior</span>
+                    </div>
                   </div>
+                  <Clock className="w-8 h-8 text-red-200" />
                 </div>
-                <Clock className="w-8 h-8 text-red-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-600 to-green-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm">Recuperado</p>
-                  <p className="text-3xl font-bold">{formatarMoeda(metricas.valorRecuperado)}</p>
-                  <div className="flex items-center mt-2">
-                    <ArrowUpRight className="w-4 h-4 text-green-300" />
-                    <span className="text-sm text-green-100">+8.7% vs mês anterior</span>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-600 to-green-700 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-100 text-sm">Recuperado</p>
+                    <p className="text-3xl font-bold">{formatarMoeda(metricas.valorRecuperado)}</p>
+                    <div className="flex items-center mt-2">
+                      <ArrowUpRight className="w-4 h-4 text-green-300" />
+                      <span className="text-sm text-green-100">+8.7% vs mês anterior</span>
+                    </div>
                   </div>
+                  <TrendingUp className="w-8 h-8 text-green-200" />
                 </div>
-                <TrendingUp className="w-8 h-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Taxa Recuperação</p>
-                  <p className="text-3xl font-bold">{metricas.taxaRecuperacao.toFixed(1)}%</p>
-                  <div className="flex items-center mt-2">
-                    <ArrowUpRight className="w-4 h-4 text-purple-300" />
-                    <span className="text-sm text-purple-100">+2.1% vs mês anterior</span>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-yellow-100 text-sm">Juros Recebidos</p>
+                    <p className="text-3xl font-bold">{formatarMoeda(metricas.valorRecuperado)}</p>
+                    <div className="flex items-center mt-2">
+                      <ArrowUpRight className="w-4 h-4 text-yellow-300" />
+                      <span className="text-sm text-yellow-100">+3.1% vs mês anterior</span>
+                    </div>
                   </div>
+                  <DollarSign className="w-8 h-8 text-yellow-200" />
                 </div>
-                <Target className="w-8 h-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm">Taxa de Recuperação</p>
+                    <p className="text-3xl font-bold">{metricas.taxaRecuperacao.toFixed(1)}%</p>
+                    <div className="flex items-center mt-2">
+                      <ArrowUpRight className="w-4 h-4 text-purple-300" />
+                      <span className="text-sm text-purple-100">+2.1% vs mês anterior</span>
+                    </div>
+                  </div>
+                  <Target className="w-8 h-8 text-purple-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Métricas Secundárias */}

@@ -37,10 +37,10 @@ const Index = () => {
   // Show loading while checking auth or role
   if (isLoading || roleLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando...</p>
+          <p className="text-slate-600 dark:text-slate-300">Carregando...</p>
         </div>
       </div>
     );
@@ -56,7 +56,7 @@ const Index = () => {
 
   // Show dashboard based on role
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#23272f]">
       <Navbar 
         userRole={userRole} 
         userName={user.email || 'Usuário'}

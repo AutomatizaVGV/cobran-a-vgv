@@ -16,14 +16,39 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+// Parâmetros padrão para automação
+const DEFAULT_SPREADSHEET_ID = 'SEU_ID_AQUI'; // Substitua pelo ID real da planilha
+const DEFAULT_RANGE = 'Sheet1!A:I';
+const DEFAULT_COLUMN_MAPPING = {
+  cliente_nome: 'Cliente',
+  cpf_cnpj: 'CPF/CNPJ',
+  valor: 'Valor',
+  vencimento: 'Vencimento',
+  empreendimento: 'Empreendimento',
+  produto: 'Produto',
+  status_cliente: 'Status Cliente',
+  tipo_cobranca: 'Tipo Cobrança',
+  quantidade_parcelas: 'Quantidade de Parcelas'
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let spreadsheetId = DEFAULT_SPREADSHEET_ID;
+  let range = DEFAULT_RANGE;
+  let columnMapping = DEFAULT_COLUMN_MAPPING;
+
   try {
-    const { spreadsheetId, range, columnMapping } = await req.json();
-    
+    // Tenta ler body, se existir
+    try {
+      const body = await req.json();
+      spreadsheetId = body.spreadsheetId || spreadsheetId;
+      range = body.range || range;
+      columnMapping = body.columnMapping || columnMapping;
+    } catch { /* se não vier body, usa os padrões */ }
+
     if (!spreadsheetId || !range) {
       return new Response(
         JSON.stringify({ error: 'spreadsheetId e range são obrigatórios' }),
